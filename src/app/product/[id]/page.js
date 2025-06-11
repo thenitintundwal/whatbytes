@@ -3,6 +3,7 @@
 import React from "react";
 import { useCart } from "../../context/CartContext";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import Image from "next/image";
 import {
   faArrowLeft,
   faMinus,
@@ -209,14 +210,17 @@ export default function ProductPage({ params }) {
           Back to Products
         </Link>
 
-        <div className="bg-white rounded-lg shadow overflow-hidden">
+        <div className="bg-white rounded-lg shadow-lg overflow-hidden">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 p-8">
             {/* Product Image */}
-            <div className="flex items-center justify-center bg-gray-50 rounded-lg p-4">
-              <img
+            <div className="relative h-96 w-full">
+              <Image
                 src={product.img}
                 alt={product.name}
-                className="max-h-96 w-auto object-contain"
+                fill
+                className="object-contain"
+                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                priority
               />
             </div>
 

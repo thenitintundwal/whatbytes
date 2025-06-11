@@ -3,6 +3,7 @@
 import React from "react";
 import { useCart } from "../context/CartContext";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import Image from "next/image";
 import {
   faMinus,
   faPlus,
@@ -65,11 +66,15 @@ export default function CartPage() {
                 key={item.id}
                 className="p-6 flex flex-col sm:flex-row items-center gap-4"
               >
-                <img
-                  src={item.img}
-                  alt={item.name}
-                  className="w-20 h-20 object-contain"
-                />
+                <div className="relative w-20 h-20">
+                  <Image
+                    src={item.img}
+                    alt={item.name}
+                    fill
+                    className="object-contain"
+                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                  />
+                </div>
                 <div className="flex-1 min-w-0">
                   <h2 className="text-lg font-semibold text-gray-800 truncate">
                     {item.name}

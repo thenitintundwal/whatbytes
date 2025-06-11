@@ -1,8 +1,9 @@
 "use client";
 
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import Image from "next/image";
 import {
   faShoppingCart,
   faMinus,
@@ -108,11 +109,15 @@ const ProductCard = ({ id, img, name, price, category }) => {
   return (
     <div className="bg-white rounded-lg shadow p-4 flex flex-col items-center">
       <Link href={`/product/${id}`} className="w-full text-center">
-        <img
-          src={img}
-          alt={name}
-          className="h-20 w-20 mb-2 mx-auto hover:scale-110 transition-transform"
-        />
+        <div className="relative h-20 w-20 mb-2 mx-auto">
+          <Image
+            src={img}
+            alt={name}
+            fill
+            className="object-contain hover:scale-110 transition-transform"
+            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+          />
+        </div>
         <div className="font-semibold text-gray-800 hover:text-blue-900">
           {name}
         </div>
@@ -162,11 +167,15 @@ const FeaturedProduct = ({ id, img, name, price, category }) => {
   return (
     <div className="bg-white rounded-lg shadow p-4 flex flex-col col-span-1 row-span-2">
       <Link href={`/product/${id}`} className="text-center">
-        <img
-          src={img}
-          alt={name}
-          className="h-32 w-32 mb-2 self-center hover:scale-110 transition-transform"
-        />
+        <div className="relative h-32 w-32 mb-2 mx-auto">
+          <Image
+            src={img}
+            alt={name}
+            fill
+            className="object-contain hover:scale-110 transition-transform"
+            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+          />
+        </div>
         <div className="font-bold text-lg text-blue-900 hover:text-blue-700">
           {name}
         </div>
@@ -217,8 +226,8 @@ const FeaturedProduct = ({ id, img, name, price, category }) => {
   );
 };
 
-// Main Content Component
-const MainContent = () => {
+// Main Content Component with Suspense
+const MainContentWithSearch = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
 
@@ -469,7 +478,18 @@ const MainContent = () => {
   );
 };
 
+// Loading component
+const Loading = () => (
+  <div className="min-h-screen flex items-center justify-center bg-gray-50">
+    <div className="text-2xl text-blue-900">Loading...</div>
+  </div>
+);
+
 // Root Component
 export default function Home() {
-  return <MainContent />;
+  return (
+    <Suspense fallback={<Loading />}>
+      <MainContentWithSearch />
+    </Suspense>
+  );
 }
