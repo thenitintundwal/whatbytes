@@ -1,4 +1,6 @@
-import React from "react";
+"use client";
+
+import React, { useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faShoppingCart } from "@fortawesome/free-solid-svg-icons";
 import {
@@ -7,7 +9,89 @@ import {
   faInstagram,
 } from "@fortawesome/free-brands-svg-icons";
 
+// Move products data outside of component to prevent recreation on each render
+const products = [
+  {
+    id: 1,
+    name: "Running Shoes",
+    price: 99,
+    category: "Clothing",
+    img: "/assets/shoe.webp",
+  },
+  {
+    id: 2,
+    name: "Wireless Headphones",
+    price: 199,
+    category: "Electronics",
+    img: "/assets/headphone.webp",
+  },
+  {
+    id: 3,
+    name: "Backpack",
+    price: 129,
+    category: "Home",
+    img: "/assets/bagpack.webp",
+  },
+  {
+    id: 4,
+    name: "Smartwatch",
+    price: 249,
+    category: "Electronics",
+    img: "/assets/smartwatch.webp",
+  },
+  {
+    id: 5,
+    name: "Sunglasses",
+    price: 149,
+    category: "Clothing",
+    img: "/assets/sunglasses.webp",
+  },
+  {
+    id: 6,
+    name: "Digital Camera",
+    price: 399,
+    category: "Electronics",
+    img: "/assets/camera.webp",
+  },
+  {
+    id: 7,
+    name: "T-shirt",
+    price: 29,
+    category: "Clothing",
+    img: "/assets/tshirt.webp",
+  },
+  {
+    id: 8,
+    name: "Smartphone",
+    price: 699,
+    category: "Electronics",
+    img: "/assets/phone.webp",
+    featured: true,
+  },
+];
+
 export default function Home() {
+  const [selectedCategory, setSelectedCategory] = useState("All");
+  const [maxPrice, setMaxPrice] = useState(1000);
+  const [searchQuery, setSearchQuery] = useState("");
+
+  // Filter products based on category, price, and search query
+  const filteredProducts = products.filter((product) => {
+    const categoryMatch =
+      selectedCategory === "All" || product.category === selectedCategory;
+    const priceMatch = product.price <= maxPrice;
+    const searchMatch =
+      product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      product.category.toLowerCase().includes(searchQuery.toLowerCase());
+    return categoryMatch && priceMatch && searchMatch;
+  });
+
+  // Get unique categories for the filter
+  const categories = [
+    "All",
+    ...new Set(products.map((product) => product.category)),
+  ];
+
   return (
     <div className="min-h-screen flex flex-col bg-gray-50">
       {/* Header */}
@@ -16,6 +100,8 @@ export default function Home() {
         <input
           className="flex-1 w-full md:w-20 px-4 md:px-14 py-2 border rounded-md text-white"
           placeholder="Search for products..."
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
         />
         <button className="flex items-center bg-blue-950 px-4 py-2 rounded-md mt-2 md:mt-0">
           <FontAwesomeIcon icon={faShoppingCart} className="mr-2" />
@@ -33,87 +119,32 @@ export default function Home() {
             <div className="mb-4 text-white rounded-lg p-4">
               <div className="font-semibold mb-2">Category</div>
               <div className="space-y-1">
-                <label className="block text-white">
-                  <input
-                    type="radio"
-                    name="cat"
-                    className="mr-2 accent-blue-300"
-                  />
-                  All
-                </label>
-                <label className="block text-white">
-                  <input
-                    type="radio"
-                    name="cat"
-                    className="mr-2 accent-blue-300"
-                  />
-                  Electronics
-                </label>
-                <label className="block text-white">
-                  <input
-                    type="radio"
-                    name="cat"
-                    className="mr-2 accent-blue-300"
-                  />
-                  Clothing
-                </label>
-                <label className="block text-white">
-                  <input
-                    type="radio"
-                    name="cat"
-                    className="mr-2 accent-blue-300"
-                  />
-                  Home
-                </label>
+                {categories.map((category) => (
+                  <label key={category} className="block text-white">
+                    <input
+                      type="radio"
+                      name="cat"
+                      value={category}
+                      checked={selectedCategory === category}
+                      onChange={(e) => setSelectedCategory(e.target.value)}
+                      className="mr-2 accent-blue-300"
+                    />
+                    {category}
+                  </label>
+                ))}
               </div>
             </div>
             <div>
-              <div className="font-semibold text-white mb-2">Price</div>
-              <input type="range" min="0" max="1000" className="w-full" />
-            </div>
-          </div>
-          <div className="text-black rounded-lg p-4">
-            <h2 className="font-bold mb-4">Category</h2>
-            <div className="mb-4 text-black">
-              <label className="block">
-                <input
-                  type="radio"
-                  name="category"
-                  className="mr-2 accent-blue-300"
-                />
-                All
-              </label>
-              <label className="block ">
-                <input
-                  type="radio"
-                  name="category"
-                  className="mr-2 accent-blue-300"
-                />
-                Electronics
-              </label>
-              <label className="block">
-                <input
-                  type="radio"
-                  name="category"
-                  className="mr-2 accent-blue-300"
-                />
-                Clothing
-              </label>
-              <label className="block">
-                <input
-                  type="radio"
-                  name="category"
-                  className="mr-2 accent-blue-300"
-                />
-                Home
-              </label>
-            </div>
-            <div>
-              <div className="font-semibold text-black mb-2">Price</div>
+              <div className="font-semibold text-white mb-2">
+                Price (Max: ${maxPrice})
+              </div>
               <input
-                type="number"
-                placeholder="5000"
-                className="w-full border rounded px-2 py-1 text-black"
+                type="range"
+                min="0"
+                max="1000"
+                value={maxPrice}
+                onChange={(e) => setMaxPrice(Number(e.target.value))}
+                className="w-full"
               />
             </div>
           </div>
@@ -122,44 +153,20 @@ export default function Home() {
         {/* Product Listing */}
         <section className="flex-1">
           <h1 className="text-2xl font-bold mb-6 text-blue-900">
-            Product Listing
+            Product Listing ({filteredProducts.length} products)
           </h1>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {/* Product Card Example */}
-            <ProductCard
-              img="/assets/shoe.webp"
-              name="Running Shoes"
-              price="$99"
-              className=" w-5 h-5"
-            />
-            <ProductCard
-              img="/assets/headphone.webp"
-              name="Wireless Headphones"
-              price="$199"
-            />
-            <ProductCard
-              img="/assets/bagpack.webp"
-              name="Backpack"
-              price="$129"
-            />
-            <ProductCard
-              img="/assets/smartwatch.webp"
-              name="Smartwatch"
-              price="$249"
-            />
-            <ProductCard
-              img="/assets/sunglasses.webp"
-              name="Sunglasses"
-              price="$149"
-            />
-            <ProductCard
-              img="/assets/camera.webp"
-              name="Digital Camera"
-              price="$399"
-            />
-            <ProductCard img="/assets/tshirt.webp" name="T-shirt" price="$29" />
-            {/* Featured Product */}
-            <FeaturedProduct />
+            {filteredProducts.map((product) =>
+              product.featured ? (
+                <FeaturedProduct key={product.id} {...product} />
+              ) : (
+                <ProductCard
+                  key={product.id}
+                  {...product}
+                  price={`$${product.price}`}
+                />
+              )
+            )}
           </div>
         </section>
       </main>
@@ -192,11 +199,12 @@ export default function Home() {
 }
 
 // Product Card Component
-function ProductCard({ img, name, price }) {
+function ProductCard({ img, name, price, category }) {
   return (
     <div className="bg-white rounded-lg shadow p-4 flex flex-col items-center">
       <img src={img} alt={name} className="h-20 w-20 mb-2" />
       <div className="font-semibold text-gray-800">{name}</div>
+      <div className="text-sm text-gray-600 mb-1">{category}</div>
       <div className="mb-2 text-blue-900 font-bold">{price}</div>
       <button className="bg-blue-700 text-white px-4 py-2 rounded">
         Add to Cart
@@ -206,16 +214,12 @@ function ProductCard({ img, name, price }) {
 }
 
 // Featured Product Component
-function FeaturedProduct() {
+function FeaturedProduct({ img, name, price, category }) {
   return (
     <div className="bg-white rounded-lg shadow p-4 flex flex-col col-span-1 row-span-2">
-      <img
-        src="/assets/phone.webp"
-        alt="Smartphone"
-        className="h-32 w-32 mb-2 self-center"
-      />
-      <div className="font-bold text-lg text-blue-900">Smartphone</div>
-      <div className="text-xl font-bold mb-1 text-blue-900">$699</div>
+      <img src={img} alt={name} className="h-32 w-32 mb-2 self-center" />
+      <div className="font-bold text-lg text-blue-900">{name}</div>
+      <div className="text-xl font-bold mb-1 text-blue-900">${price}</div>
       <div className="flex items-center mb-2">
         <span className="text-yellow-400">★★★★★</span>
       </div>
@@ -225,7 +229,7 @@ function FeaturedProduct() {
       <div className="text-xs text-gray-500 mb-4">
         Category
         <br />
-        Electronics
+        {category}
       </div>
       <button className="bg-blue-700 text-white px-4 py-2 rounded">
         Add to Cart
