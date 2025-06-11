@@ -246,7 +246,7 @@ export default function ProductPage({ params }) {
               </div>
 
               <div className="text-2xl font-bold text-blue-900 mb-4">
-                ${product.price}
+                {product.price}
               </div>
 
               <p className="text-gray-600 mb-6">{product.description}</p>
